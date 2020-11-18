@@ -1,18 +1,38 @@
+import models.Cube;
 import models.Rectangle;
+import spark.ModelAndView;
+import spark.template.handlebars.HandlebarsTemplateEngine;
 
-import java.io.Console;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static spark.Spark.*;
 
 public class App {
     public static void main(String[] args) {
-        Console myConsole = System.console();
-        System.out.println("Enter the length of your rectangle:");
-        String stringLength = myConsole.readLine();
-        int intLength = Integer.parseInt(stringLength);
-        System.out.println("Enter the width of your rectangle:");
-        String stringWidth = myConsole.readLine();
-        int intWidth = Integer.parseInt(stringWidth);
-        Rectangle rectangle = new Rectangle(intLength, intWidth);
-        boolean squareResult = rectangle.isSquare();
-        System.out.println("Is your rectangle a square, too? " + squareResult + "!");
+
+        get("/", (req, res) -> {
+            //just for testing - make two new objects so we have something to retrieve
+            Rectangle rectangle = new Rectangle(3,2);
+            Rectangle squareRectangle = new Rectangle(12, 12);
+
+            Map<String, ArrayList<Rectangle>> model = new HashMap<>();
+            ArrayList myRectangleArrayList = Rectangle.getAll();
+            model.put("myRectangles", myRectangleArrayList);
+            return new ModelAndView(model, "index.hbs");
+        }, new HandlebarsTemplateEngine());
+        post("/rectangles/new", (req, res) -> {
+            Map<String, Object> model = new HashMap<>(); // I may be different from your code to account for generic “Objects”
+            int height = Integer.parseInt(req.queryParams("height"));
+            int width = Integer.parseInt(req.queryParams("width"));
+            Rectangle myRectangle = new Rectangle(height, width); //as we know this will automatically add itself to a list of all rectangles.
+            model.put("myRectangle", myRectangle); //don’t forget me!
+            if (myRectangle.getShape()) {
+                Cube myCube = new Cube(myRectangle);
+                model.put("myCube", myCube);
+            }
+            return new ModelAndView(model, "rectangle-detail.hbs"); //render a detail page instead of redirecting to home.
+        }, new HandlebarsTemplateEngine());
     }
 }
