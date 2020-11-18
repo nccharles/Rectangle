@@ -7,7 +7,7 @@ public class Rectangle {
     private int height;
     private int width;
     private static ArrayList<Rectangle> mInstances = new ArrayList<>();
-    private Boolean shape;
+    private boolean shape;
 
     public Rectangle(int height, int width) {
         this.height = height;
